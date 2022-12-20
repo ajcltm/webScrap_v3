@@ -4,15 +4,17 @@ from abc import ABC, abstractmethod
 import os
 from pydantic import BaseModel
 from tqdm import tqdm
+import random
+import time
 
 
-class Work(ABC):
+class Work(ABC, BaseModel):
     
     def __hash__(self):
         return hash((type(self),) + tuple(self.__dict__.values()))
 
     def get_file_name(self):
-        return '_'.join(['_'.join(item) for item in self.dict().items()])
+        return '_'.join([f'{key}_{value}' for key, value in self.dict().items()])
     
     @abstractmethod
     def request(self):
@@ -20,7 +22,7 @@ class Work(ABC):
 
     def save(self, folder_path, data, type):
         saver_ = saver.Factory_saver().get_saver(type=type)
-        saver_(folder_path).save_file(data=data, type=type)
+        saver_(folder_path).save_file(data=data, file_name=self.get_file_name(), type=type)
 
     def do_work(self, folder_path, type):
         data = self.request()        
@@ -43,10 +45,22 @@ class Works(BaseModel):
     
     def get_workedList(self, folder_path):
         file_name_lst = os.listdir(folder_path)
-        return [self.works[0].__class__(**self.file_name_to_dict(file_name=file_name)) for file_name in tqdm(file_name_lst, desc='now getting the worked list : ')]
+        if file_name_lst:
+            return [self.works[0].__class__(**self.file_name_to_dict(file_name=file_name)) for file_name in tqdm(file_name_lst, desc='now getting the worked list : ')]
+        return None
+    
+    def random_sleep(self):
+        range_option = {'quicker': [0, .5], 'slower': [.5, 2], 'stop': [10, 15]}
+        sleepLevel = random.choices(['quicker', 'slower', 'stop'], weights=[.6, .39, .01])
+        range = range_option.get(sleepLevel[0])
+        time.sleep(random.uniform(range[0], range[1]))
     
     def do_work(self, folder_path, type):
         workedList = self.get_workedList(folder_path) 
-        toWorkList = self.filt(first_set=workedList, other_set=self.works)
+        if workedList:
+            toWorkList = self.filt(first_set=workedList, other_set=self.works)
+        else:
+            toWorkList = self.works
         for work in tqdm(toWorkList, desc='now working on process'):
-            work.do_work(folder_path=folder_path, type=type)
+           work.do_work(folder_path=folder_path, type=type)
+           self.random_sleep()

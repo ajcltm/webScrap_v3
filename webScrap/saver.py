@@ -19,7 +19,7 @@ class PickleSaver:
     def __init__(self, filePath:Path):
         self.filePath = filePath
 
-    def save_file(self, data:any, type='pickle') -> None:
+    def save_file(self, data:any, file_name, type='pickle') -> None:
         save_path = self.filePath.joinpath(f'{file_name}.{type}')
         with open(save_path, 'wb') as fw:
             pickle.dump(data, fw, protocol=pickle.HIGHEST_PROTOCOL)
@@ -29,7 +29,7 @@ class GeneralSaver:
     def __init__(self, filePath:Path):
         self.filePath = filePath
 
-    def save_file(self, data:any, type) -> None:
+    def save_file(self, data:any, file_name, type) -> None:
         save_path = self.filePath.joinpath(f'{file_name}.{type}')
         with open(save_path, 'wb') as fw:
             fw.write(data)
