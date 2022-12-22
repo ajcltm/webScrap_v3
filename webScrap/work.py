@@ -1,8 +1,7 @@
 from webScrap import saver
-from typing import List
 from abc import ABC, abstractmethod
 import os
-from pydantic import BaseModel
+from pydantic import BaseModel 
 from tqdm import tqdm
 import random
 import time
@@ -29,7 +28,6 @@ class Work(ABC, BaseModel):
         self.save(folder_path=folder_path, data=data, type=type)
 
 class Works(BaseModel):
-    works : List[Work]
 
     def filt(self, first_set, other_set):
         return list(set(other_set).difference(set(first_set)))
