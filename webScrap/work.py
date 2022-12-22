@@ -46,7 +46,7 @@ class Works(BaseModel):
     def get_workedList(self, folder_path):
         file_name_lst = os.listdir(folder_path)
         if file_name_lst:
-            return [self.works[0].__class__(**self.file_name_to_dict(file_name=file_name)) for file_name in tqdm(file_name_lst, desc='now getting the worked list : ')]
+            return [list(self.__dict__.values())[0][0].__class__(**self.file_name_to_dict(file_name=file_name)) for file_name in tqdm(file_name_lst, desc='now getting the worked list : ')]
         return None
     
     def random_sleep(self):
@@ -58,9 +58,9 @@ class Works(BaseModel):
     def do_work(self, folder_path, type):
         workedList = self.get_workedList(folder_path) 
         if workedList:
-            toWorkList = self.filt(first_set=workedList, other_set=self.works)
+            toWorkList = self.filt(first_set=workedList, other_set=list(self.__dict__.values())[0])
         else:
-            toWorkList = self.works
+            toWorkList = list(self.__dict__.values())[0]
         for work in tqdm(toWorkList, desc='now working on process'):
            work.do_work(folder_path=folder_path, type=type)
            self.random_sleep()
