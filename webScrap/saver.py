@@ -1,6 +1,7 @@
 from typing_extensions import Protocol
 from pathlib import Path
 import pickle
+import json
 
 class IFileSaver(Protocol):
 
@@ -10,7 +11,7 @@ class IFileSaver(Protocol):
 class Factory_saver:
 
     def get_saver(self, type):
-        option = {'pickle':PickleSaver, 'general':GeneralSaver}
+        option = {'pickle':PickleSaver, 'json':JsonSaver , 'general':GeneralSaver}
         return option.get(type)
 
 
@@ -34,7 +35,15 @@ class GeneralSaver:
         with open(save_path, 'wb') as fw:
             fw.write(data)
 
+class JsonSaver:
 
+    def __init__(self, filePath:Path):
+        self.filePath = filePath
+
+    def save_file(self, data:any, file_name, type='json') -> None:
+        save_path = self.filePath.joinpath(f'{file_name}.{type}')
+        with open(save_path, 'w') as fw:
+            json.dump(data, fw)
 
 if __name__ == '__main__':
     import requests
